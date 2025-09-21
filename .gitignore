@@ -1,0 +1,32 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+
+# Virtual environment
+venv/
+.env/
+*.env
+
+# --- Node / React ---
+node_modules/
+dist/
+build/
+
+# --- OS generated files ---
+.DS_Store
+Thumbs.db
+
+# --- VSCode settings ---
+.vscode/
+
+# --- FAISS index and outputs ---
+backend/output/
+backend/data/
+
+# --- Backups and temporary files ---
+*.bak
+*.tmp

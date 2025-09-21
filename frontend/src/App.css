@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  background: url("https://emcos.com/wp-content/themes/EMC/img/bg.png") no-repeat center center fixed;
+  background-size: cover; /* Ensures it fills the screen */
+  background-attachment: fixed; /* Keeps it stable while scrolling */
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh; /* Full screen height */
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #333;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
+}
+
+.search-bar-icon {
+  position: relative;
+}
+
+.search-bar-icon input {
+  padding-right: 44px;
+}
+
+.search-bar-icon .search-icon-separator {
+  position: absolute;
+  right: 44px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: #b0b0b0;
+  opacity: 0.6;
+  z-index: 1;
+  border-radius: 1px;
+}
+
+.search-bar-icon .search-icon-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.search-bar-icon .search-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.search-bar input {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 480px;
+  outline: none;
+  background: #fff;
+  color: #222;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}
+
+.search-bar input::placeholder {
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  color: #aaa;
+  font-size: 1rem;
+}
+
+.search-bar button {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.search-bar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.answer-box {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #f9f9f9;
+  max-width: 400px;
+  text-align: center;
+}
