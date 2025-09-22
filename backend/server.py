@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from scripts.search_faiss import search_one
+from scripts.search_faiss import search_one, rewrite_with_gpt
 
 
 app = Flask(__name__)
@@ -15,20 +15,41 @@ def search():
     if not query:
         return jsonify({"error": "Missing 'query'"}), 400
 
-    # --- Run your FAISS search ---
+    # --- Run FAISS search ---
     print(f"\n[Flask] Running FAISS search for query: {query}")
-    results = search_one(query)  # <-- This calls your existing code
+    faiss_results = search_one(query)  # returns top chunks
 
-    # Print results to terminal for debugging
+    # Print FAISS results to terminal
     print("\n[Flask] FAISS Results:")
-    for i, (distance, payload) in enumerate(results, start=1):
+    for i, (distance, payload) in enumerate(faiss_results, start=1):
         print(f"Result {i}:")
         print(f"  Distance: {distance}")
         print(f"  Doc ID: {payload.get('doc_id')}")
         print(f"  Text: {payload.get('text')[:200]}...\n")
 
-    # For now, return a simple confirmation to frontend
-    return jsonify({"ok": True, "query": query, "results_count": len(results)})
+    # --- Generate GPT final answer ---
+    print("[Flask] Generating GPT answer...")
+    gpt_answer = rewrite_with_gpt(query, faiss_results)
+
+    # Print GPT answer to terminal
+    print("\n[Flask] GPT Final Answer:")
+    print(gpt_answer)
+
+    # Return both FAISS and GPT to frontend
+    return jsonify({
+        "ok": True,
+        "query": query,
+        "results_count": len(faiss_results),
+        "gpt_answer": gpt_answer,
+        "results": [
+            {
+                "distance": float(distance),
+                "doc_id": payload.get("doc_id"),
+                "text": payload.get("text")[:500]  # preview first 500 characters
+            }
+            for distance, payload in faiss_results
+        ]
+    })
 
 if __name__ == "__main__":
     # Run on 5000 so it doesn't clash with Vite (5173)

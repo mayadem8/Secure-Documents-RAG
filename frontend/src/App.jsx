@@ -3,34 +3,40 @@ import "./App.css";
 
 function App() {
   const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
+  const [answer, setAnswer] = useState(""); // GPT answer
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (!question.trim()) return;
+    e.preventDefault();
+    if (!question.trim()) return;
 
-  setLoading(true);
+    setLoading(true);
+    setAnswer(""); // clear previous answer
 
-  try {
-    // Send query to Flask backend
-    const response = await fetch("http://127.0.0.1:5000/search", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ query: question }), // send as JSON
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:5000/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: question }),
+      });
 
-    const data = await response.json();
-    console.log("Response from backend:", data); // check in browser console
+      const data = await response.json();
+      console.log("Response from backend:", data);
 
-  } catch (error) {
-    console.error("Error sending query:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+      if (data.ok && data.gpt_answer) {
+        setAnswer(data.gpt_answer);
+      } else {
+        setAnswer("No answer found.");
+      }
+    } catch (error) {
+      console.error("Error sending query:", error);
+      setAnswer("Error: Could not retrieve answer.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="container">
@@ -68,7 +74,12 @@ function App() {
         </button>
       </form>
 
-      {answer && <div className="answer-box">{answer}</div>}
+      {/* Display GPT Answer ONLY when loading or answer exists */}
+      {(loading || answer) && (
+        <div className="answer-box">
+          {loading ? <p>Loading...</p> : <p>{answer}</p>}
+        </div>
+      )}
     </div>
   );
 }
