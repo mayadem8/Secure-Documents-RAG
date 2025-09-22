@@ -4,15 +4,16 @@ import "./App.css";
 function App() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState(""); // GPT answer
+  const [docId, setDocId] = useState(""); // NEW: store top document ID
   const [loading, setLoading] = useState(false);
 
-  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!question.trim()) return;
 
     setLoading(true);
-    setAnswer(""); // clear previous answer
+    setAnswer("");
+    setDocId(""); // clear old doc id
 
     try {
       const response = await fetch("http://127.0.0.1:5000/search", {
@@ -26,8 +27,13 @@ function App() {
       const data = await response.json();
       console.log("Response from backend:", data);
 
-      if (data.ok && data.gpt_answer) {
-        setAnswer(data.gpt_answer);
+      if (data.ok) {
+        if (data.gpt_answer) {
+          setAnswer(data.gpt_answer); // show GPT answer
+        }
+        if (data.top_doc_id) {
+          setDocId(data.top_doc_id); // show top document ID
+        }
       } else {
         setAnswer("No answer found.");
       }
@@ -39,14 +45,22 @@ function App() {
     }
   };
 
-  // Clear both the input and answer
   const handleClear = () => {
     setQuestion("");
     setAnswer("");
+    setDocId("");
   };
 
   return (
     <div className="container">
+      {/* Logo */}
+      <img
+        className="logo"
+        src="https://emcos.com/wp-content/themes/EMC/img/logo.png"
+        alt="EMCoS Logo"
+      />
+
+      {/* Search Bar */}
       <form className="search-bar search-bar-icon" onSubmit={handleSubmit}>
         <input
           type="text"
@@ -57,7 +71,7 @@ function App() {
           disabled={loading}
         />
 
-        {/* Clear button, only visible when there's text or an answer */}
+        {/* Clear button */}
         {(question || answer) && (
           <button
             type="button"
@@ -71,7 +85,7 @@ function App() {
 
         <span className="search-icon-separator"></span>
 
-        {/* Submit button */}
+        {/* Search button */}
         <button
           type="submit"
           className="search-icon-btn"
@@ -96,10 +110,23 @@ function App() {
         </button>
       </form>
 
-      {/* Answer box, visible only when loading or answer exists */}
-      {(loading || answer) && (
+      {/* Answer box */}
+      {(loading || answer || docId) && (
         <div className="answer-box">
-          {loading ? <p>Loading...</p> : <p>{answer}</p>}
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <>
+              <p>{answer}</p>
+              {docId && (
+                <p style={{ marginTop: '8px' }}>
+                  <strong>Source Document:</strong> {" "}
+                  <span style={{wordBreak: "break-all"}}>{docId}</span>
+                </p>
+              )}
+              
+            </>
+          )}
         </div>
       )}
     </div>

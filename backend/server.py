@@ -37,19 +37,21 @@ def search():
 
     # Return both FAISS and GPT to frontend
     return jsonify({
-        "ok": True,
-        "query": query,
-        "results_count": len(faiss_results),
-        "gpt_answer": gpt_answer,
-        "results": [
-            {
-                "distance": float(distance),
-                "doc_id": payload.get("doc_id"),
-                "text": payload.get("text")[:500]  # preview first 500 characters
-            }
-            for distance, payload in faiss_results
-        ]
-    })
+    "ok": True,
+    "query": query,
+    "results_count": len(faiss_results),
+    "gpt_answer": gpt_answer,
+    # NEW: send the top doc id (first FAISS hit) back to the UI
+    "top_doc_id": (faiss_results[0][1].get("doc_id") if faiss_results else None),
+    "results": [
+        {
+            "distance": float(distance),
+            "doc_id": payload.get("doc_id"),
+            "text": payload.get("text")[:500]
+        }
+        for distance, payload in faiss_results
+    ]
+})
 
 if __name__ == "__main__":
     # Run on 5000 so it doesn't clash with Vite (5173)
