@@ -6,6 +6,7 @@ function App() {
   const [answer, setAnswer] = useState(""); // GPT answer
   const [loading, setLoading] = useState(false);
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!question.trim()) return;
@@ -38,6 +39,12 @@ function App() {
     }
   };
 
+  // Clear both the input and answer
+  const handleClear = () => {
+    setQuestion("");
+    setAnswer("");
+  };
+
   return (
     <div className="container">
       <form className="search-bar search-bar-icon" onSubmit={handleSubmit}>
@@ -49,7 +56,22 @@ function App() {
           autoComplete="new-password"
           disabled={loading}
         />
+
+        {/* Clear button, only visible when there's text or an answer */}
+        {(question || answer) && (
+          <button
+            type="button"
+            className="clear-btn"
+            onClick={handleClear}
+            aria-label="Clear"
+          >
+            ×
+          </button>
+        )}
+
         <span className="search-icon-separator"></span>
+
+        {/* Submit button */}
         <button
           type="submit"
           className="search-icon-btn"
@@ -74,7 +96,7 @@ function App() {
         </button>
       </form>
 
-      {/* Display GPT Answer ONLY when loading or answer exists */}
+      {/* Answer box, visible only when loading or answer exists */}
       {(loading || answer) && (
         <div className="answer-box">
           {loading ? <p>Loading...</p> : <p>{answer}</p>}
