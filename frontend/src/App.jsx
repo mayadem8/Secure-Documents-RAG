@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import ReactMarkdown from 'react-markdown';
 
 function App() {
   const [question, setQuestion] = useState("");
@@ -119,7 +120,7 @@ function App() {
       <p>Loading...</p>
     ) : (
       <>
-        <p>{answer}</p>
+        <ReactMarkdown>{answer}</ReactMarkdown>
         {docIds.length > 0 && (
           <div style={{ marginTop: '8px' }}>
             <strong>Source Documents:</strong>
