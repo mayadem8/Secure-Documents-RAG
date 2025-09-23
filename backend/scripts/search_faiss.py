@@ -80,13 +80,13 @@ def search_one(query: str):
         return distances[0][0], metadata[best_idx]
     
     candidates.sort(reverse=True, key=lambda x: x[0])
-    top_chunks = [(d, p) for _, d, p in candidates[:3]]
-    return top_chunks
+    top_chunks = [(d, p) for _, d, p in candidates if d >= 0.5]
+    all_doc_ids = list({p.get("doc_id") for _, p in top_chunks if p.get("doc_id")})
 
-    # 5) Pick the single best candidate
-    candidates.sort(reverse=True, key=lambda x: x[0])
-    _, best_d, best_payload = candidates[0]
-    return best_d, best_payload
+
+    return top_chunks, all_doc_ids
+
+ 
 
 
 
@@ -100,13 +100,14 @@ def rewrite_with_gpt(question: str, chunks: list) -> str:
 
     prompt = f"""
 You are given multiple text excerpts from technical documents and a user question.
-Write a single, clear answer to the question using ONLY the information in these texts.
+Write a report to the question using ONLY the information in these texts.
 
 Instructions:
 - Do NOT add any new facts that aren't explicitly in the texts.
 - Remove irrelevant details, math, and references.
 - If there are numerical values, include them accurately.
-- Keep the answer short, factual, and user-friendly (2–4 sentences).
+- report should be as detailed as possible, as long as possible while still being relevant.
+- If the texts don't contain the answer, say "The provided documents do not contain sufficient information. 
 
 Question: {question}
 

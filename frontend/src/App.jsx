@@ -4,7 +4,8 @@ import "./App.css";
 function App() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState(""); // GPT answer
-  const [docId, setDocId] = useState(""); // NEW: store top document ID
+  const [docIds, setDocIds] = useState([]);
+
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -13,7 +14,8 @@ function App() {
 
     setLoading(true);
     setAnswer("");
-    setDocId(""); // clear old doc id
+    setDocIds([]); // clear old doc ids
+
 
     try {
       const response = await fetch("http://127.0.0.1:5000/search", {
@@ -31,9 +33,9 @@ function App() {
         if (data.gpt_answer) {
           setAnswer(data.gpt_answer); // show GPT answer
         }
-        if (data.top_doc_id) {
-          setDocId(data.top_doc_id); // show top document ID
-        }
+        if (data.source_docs) {
+  setDocIds(data.source_docs);
+}
       } else {
         setAnswer("No answer found.");
       }
@@ -111,24 +113,30 @@ function App() {
       </form>
 
       {/* Answer box */}
-      {(loading || answer || docId) && (
-        <div className="answer-box">
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <>
-              <p>{answer}</p>
-              {docId && (
-                <p style={{ marginTop: '8px' }}>
-                  <strong>Source Document:</strong> {" "}
-                  <span style={{wordBreak: "break-all"}}>{docId}</span>
-                </p>
-              )}
-              
-            </>
-          )}
-        </div>
-      )}
+      {(loading || answer || docIds.length > 0) && (
+  <div className="answer-box">
+    {loading ? (
+      <p>Loading...</p>
+    ) : (
+      <>
+        <p>{answer}</p>
+        {docIds.length > 0 && (
+          <div style={{ marginTop: '8px' }}>
+            <strong>Source Documents:</strong>
+            <ul>
+              {docIds.map((id, index) => (
+                <li key={index} style={{ wordBreak: "break-all" }}>
+                  {id}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </>
+    )}
+  </div>
+)}
+
     </div>
   );
 }

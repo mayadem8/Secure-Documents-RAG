@@ -17,7 +17,7 @@ def search():
 
     # --- Run FAISS search ---
     print(f"\n[Flask] Running FAISS search for query: {query}")
-    faiss_results = search_one(query)  # returns top chunks
+    faiss_results, all_doc_ids = search_one(query)  # returns top chunks
 
     # Print FAISS results to terminal
     print("\n[Flask] FAISS Results:")
@@ -39,6 +39,7 @@ def search():
     return jsonify({
     "ok": True,
     "query": query,
+    "source_docs": all_doc_ids,
     "results_count": len(faiss_results),
     "gpt_answer": gpt_answer,
     # NEW: send the top doc id (first FAISS hit) back to the UI
