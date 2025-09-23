@@ -34,6 +34,12 @@ function App() {
         if (data.gpt_answer) {
           setAnswer(data.gpt_answer); // show GPT answer
         }
+
+        if (data.gpt_answer && data.gpt_answer.includes("do not contain sufficient information")) {
+    setDocIds([]); // clear docs completely
+  } else if (data.source_docs) {
+    setDocIds(data.source_docs);
+  }
         if (data.source_docs) {
   setDocIds(data.source_docs);
 }
@@ -51,7 +57,7 @@ function App() {
   const handleClear = () => {
     setQuestion("");
     setAnswer("");
-    setDocId("");
+    setDocIds("");
   };
 
   return (
