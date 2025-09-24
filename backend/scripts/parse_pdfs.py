@@ -3,7 +3,7 @@ from pypdf import PdfReader
 
 # --- CONFIG ---
 PDF_ROOT = os.path.join("backend", "data")
-OUTPUT_ROOT = os.path.join("backend", "output")
+OUTPUT_ROOT = os.path.join("backend", "output", "raw_txt")
 
 os.makedirs(OUTPUT_ROOT, exist_ok=True)
 

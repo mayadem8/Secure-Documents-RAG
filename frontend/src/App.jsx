@@ -182,6 +182,24 @@ function App() {
                       </li>
                     ))}
                   </ul>
+                  {answer && (
+                    <button
+                      style={{ marginTop: 16, padding: "6px 16px", fontSize: 15, cursor: "pointer", background: "#0696d7", color: "#fff", border: "none" }}
+                      onClick={() => {
+                        const blob = new Blob([answer], { type: "text/plain" });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = "report.txt";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                      }}
+                    >
+                      Download as .txt
+                    </button>
+                  )}
                 </div>
               )}
             </>

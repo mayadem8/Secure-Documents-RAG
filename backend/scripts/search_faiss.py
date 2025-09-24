@@ -39,15 +39,6 @@ def is_math_heavy(s: str, threshold: float = 0.15) -> bool:
         ratio = max(ratio, 0.2)
     return ratio > threshold
 
-# Domain keywords to boost practical chunks
-KEYWORDS = [
-    "flaw", "defect", "broken wire", "wire rope", "rope",
-    "magnetic", "flux leakage", "sensor", "permanent magnet",
-    "detector", "inspection", "detect", "detection"
-]
-def keyword_score(s: str) -> int:
-    low = s.lower()
-    return sum(1 for kw in KEYWORDS if kw in low)
 
 def search_one(query: str):
     # 1) Encode query (float32 for faiss)
@@ -56,7 +47,8 @@ def search_one(query: str):
     # 2) Ask FAISS for more results; we’ll pick the single best
     distances, indices = index.search(q, 20)  # top-20 from FAISS
 
-    # 3) Re-rank with math filter + keyword boost
+
+    # 3) Re-rank with math filter only (no keyword bias)
     candidates = []
     for d, idx in zip(distances[0], indices[0]):
         if idx == -1:
@@ -68,10 +60,7 @@ def search_one(query: str):
 
         # Convert L2 distance to a similarity-ish value (lower d -> higher score)
         sim = 1.0 / (1.0 + float(d))
-        kscore = keyword_score(text)  # simple domain boost
-
-        # Blend: mostly semantic, some keyword boost
-        final = 0.7 * sim + 0.3 * (kscore / 5.0)  # normalize keyword part a bit
+        final = sim
         candidates.append((final, d, p))
 
     # 4) Fallback if everything filtered out
