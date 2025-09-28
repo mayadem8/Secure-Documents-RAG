@@ -41,39 +41,41 @@ def is_math_heavy(s: str, threshold: float = 0.15) -> bool:
 
 
 def search_one(query: str):
-    # 1) Encode query (float32 for faiss)
+    # 1) Encode query
     q = model.encode([query]).astype("float32")
 
-    # 2) Ask FAISS for more results; we’ll pick the single best
-    distances, indices = index.search(q, 20)  # top-20 from FAISS
+    # 2) Search FAISS index
+    distances, indices = index.search(q, 20)
 
-
-    # 3) Re-rank with math filter only (no keyword bias)
     candidates = []
     for d, idx in zip(distances[0], indices[0]):
         if idx == -1:
             continue
+
         p = metadata[idx]
         text = p.get("text", "")
-        if is_math_heavy(text):
-            continue  # skip theory/equation heavy chunks
 
-        # Convert L2 distance to a similarity-ish value (lower d -> higher score)
+        # REMOVE MATH FILTERING COMPLETELY
+        # No skipping or penalties for math chunks now
+
+        # Convert FAISS distance to similarity
         sim = 1.0 / (1.0 + float(d))
         final = sim
+
         candidates.append((final, d, p))
 
-    # 4) Fallback if everything filtered out
     if not candidates:
         best_idx = indices[0][0]
         return distances[0][0], metadata[best_idx]
-    
+
+    # Sort by similarity
     candidates.sort(reverse=True, key=lambda x: x[0])
-    top_chunks = [(d, p) for _, d, p in candidates if d >= 0.5]
+
+    top_chunks = [(d, p) for _, d, p in candidates]
     all_doc_ids = list({p.get("doc_id") for _, p in top_chunks if p.get("doc_id")})
 
-
     return top_chunks, all_doc_ids
+
 
  
 
@@ -93,10 +95,13 @@ Write a report to the question using ONLY the information in these texts.
 
 Instructions:
 - Do NOT add any new facts that aren't explicitly in the texts.
-- Remove irrelevant details, math, and references.
+- Write as technically and specifically as possible.
+- rerurn math and technicall examples if possible
+- Write general descriptions and words as less as possible.
 - If there are numerical values, include them accurately.
 - report should be as detailed as possible, as long as possible while still being relevant.
 - If the texts don't contain the answer, say "The provided documents do not contain sufficient information. 
+- Dont return references
 
 
 
